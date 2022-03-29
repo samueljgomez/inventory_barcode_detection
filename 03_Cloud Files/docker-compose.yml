@@ -1,0 +1,44 @@
+version: '3'
+services:
+  php-apache:
+    container_name: apache
+    build:
+      context: ./php-apache
+    ports:
+      - 80:80
+    volumes:
+      - ./DocumentRoot:/var/www/html
+    links:
+      - 'mariadb'
+
+  mariadb:
+    container_name: mysql
+    image: mariadb:10.1
+    volumes:
+      - mariadb:/var/lib/mysql
+    environment:
+      TZ: "America/Chicago"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+      MYSQL_ROOT_PASSWORD: "rootpwd"
+      MYSQL_USER: 'eric'
+      MYSQL_PASSWORD: 'w251'
+      MYSQL_DATABASE: 'invintory'
+
+  mqtt:
+    container_name: mqtt
+    image: toke/mosquitto
+    restart: always
+    expose:
+      - 1883
+    ports:
+      - 1883:1883
+    network_mode: bridge
+
+  python_mqtt:
+    container_name: python_mqtt
+    build:
+      context: ./python_mqtt
+    restart: always
+
+volumes:
+  mariadb:
